@@ -3,7 +3,7 @@
   <metadata>
     <id>nuget.copy.extension</id>
     <title>Nuget Copy Extension</title>
-    <version>1.0</version>
+    <version>1.0.0.1</version>
     <authors>Rob Reynolds</authors>
     <owners>Rob Reynolds</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>

@@ -4,7 +4,6 @@ namespace NuGet.Copy
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.IO;
-    using System.Runtime.InteropServices;
     using Commands;
     using Common;
 
@@ -44,7 +43,7 @@ namespace NuGet.Copy
                 PrepareDestination();
                 PrepareApiKey();
 
-                Console.WriteLine("Copying {0} from {1} to {2}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version, string.IsNullOrEmpty(Source) ? "any source" : Source, Destination, _workDirectory);
+                Console.WriteLine("Copying {0} from {1} to {2}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version, string.IsNullOrEmpty(Source) ? "any source" : Source, Destination);
 
                 CreateWorkDirectoryIfNotExists(_workDirectory);
                 InstallPackageLocally(packageId, _workDirectory);
@@ -85,7 +84,7 @@ namespace NuGet.Copy
                 if (string.IsNullOrEmpty(ApiKey))
                 {
                     ApiKey = GetApiKey(_sourceProvider, Settings.UserSettings, Destination, true);
-                }    
+                }
             }
         }
 
@@ -108,7 +107,6 @@ namespace NuGet.Copy
             }
 
             install.ExecuteCommand();
-
         }
 
         private void PushToDestination(string workDirectory)
@@ -150,8 +148,8 @@ namespace NuGet.Copy
                 //push.Arguments.Add(Path.GetFullPath(packagePath));
                 //push.Source = _sourceProvider.ResolveSource(Destination);
                 //push.ExecuteCommand();
-                
-                PushPackage(Path.GetFullPath(packagePath), Destination,ApiKey);
+
+                PushPackage(Path.GetFullPath(packagePath), Destination, ApiKey);
             }
             catch (Exception ex)
             {
@@ -168,7 +166,9 @@ namespace NuGet.Copy
             string apiKey = settings.GetDecryptedValue(ApiKeysSectionName, source);
             if (string.IsNullOrEmpty(apiKey) && throwIfNotFound)
             {
-                throw new CommandLineException("No API Key was provided and no API Key could be found for {0}. To save an API Key for a source use the 'setApiKey' command.", new object[] { sourceProvider.GetDisplayName(source) });
+                throw new CommandLineException(
+                    "No API Key was provided and no API Key could be found for {0}. To save an API Key for a source use the 'setApiKey' command.",
+                    new object[] { sourceProvider.GetDisplayName(source) });
             }
             return apiKey;
         }
@@ -176,7 +176,7 @@ namespace NuGet.Copy
         private void PushPackage(string packagePath, string source, string apiKey)
         {
             var gallery = new GalleryServer(source);
-          
+
             // Push the package to the server
             var package = new ZipPackage(packagePath);
 
@@ -192,7 +192,7 @@ namespace NuGet.Copy
                 }
             };
 
-            Console.WriteLine("Pushing {0} to '{1}", package.GetFullName(), _sourceProvider.GetDisplayName(source));
+            Console.WriteLine("Pushing {0} to {1}", package.GetFullName(), _sourceProvider.GetDisplayName(source));
 
             try
             {
@@ -216,11 +216,11 @@ namespace NuGet.Copy
             cmd.Console = Console;
             cmd.Source = source;
             cmd.Arguments = new List<string>
-            {
-                package.Id,
-                package.Version.ToString(),
-                apiKey
-            };
+                                {
+                                    package.Id,
+                                    package.Version.ToString(),
+                                    apiKey
+                                };
             cmd.Execute();
         }
 
@@ -233,6 +233,5 @@ namespace NuGet.Copy
                 Directory.Delete(workDirectory, true);
             }
         }
-
     }
 }
