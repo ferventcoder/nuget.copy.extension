@@ -1,0 +1,65 @@
+﻿<Project ToolsVersion="4.0"
+         DefaultTargets="Go"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" /-->
+  <PropertyGroup>
+    <GoDependsOn>Compile;PrepareNuGetFiles;Package</GoDependsOn>
+    <Configuration>Release</Configuration>
+    <Platform>Any CPU</Platform>
+    <BuildDirectory>build_output\</BuildDirectory>
+    <BuildPath>$(MSBuildProjectDirectory)\$(BuildDirectory)</BuildPath>
+    <NuGetDirectory>$(MSBuildProjectDirectory)\nuget</NuGetDirectory>
+  </PropertyGroup>
+
+  <Target Name="Go"
+          DependsOnTargets="$(GoDependsOn)" />
+
+
+  <Target Name="Compile">
+    <RemoveDir Directories="$(BuildPath)" ContinueOnError="true" />
+    <MSBuild Projects="NuGet.Copy.sln"
+             Properties="Configuration=$(Configuration);Platform=$(Platform);OutDir=$(BuildPath)" />
+  </Target>
+  
+  <Target Name="CleanBuildOutput">   
+    <ItemGroup>
+      <FilesToRemove 
+        Exclude="$(BuildPath)\_PublishedApplications\**\*;$(BuildPath)\_PublishedWebSites\**\*" 
+        Include="$(BuildPath)\**\*"
+      />
+    </ItemGroup>
+    <Delete Files="@(FilesToRemove)" />
+    <RemoveDir Directories="@(DirectoriesToRemove)" />
+  </Target>
+  
+  <Target Name="PrepareNuGetFiles">
+   <ItemGroup>
+      <NuGetFiles Include="$(NuGetDirectory)\**\*" />
+      <NuGetFilesToPack Include="$(BuildPath)\NuGet.Copy.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NuGetFiles)"
+      DestinationFiles="@(NuGetFiles->'$(BuildPath)\nuget\%(RecursiveDir)%(Filename)%(Extension)')"
+      Retries="3"
+      RetryDelayMilliseconds="300" 
+      />
+    <Copy SourceFiles="@(NuGetFilesToPack)"
+      DestinationFiles="@(NuGetFilesToPack->'$(BuildPath)\nuget\lib\%(RecursiveDir)%(Filename)%(Extension)')"
+      Retries="3"
+      RetryDelayMilliseconds="300" 
+      />
+  </Target>
+  
+  <Target Name="Package">
+  <ItemGroup>
+      <NuspecFiles Include="$(BuildPath)**\*nuspec" />
+      <FilesToDelete Exclude="$(BuildPath)\**\*.nupkg" Include="$(BuildPath)\**\*" />
+      <DirectoriesToDelete Include="$(BuildPath)\nuget" />
+    </ItemGroup>
+    <Exec Command="nuget pack %(NuspecFiles.FullPath)"
+          WorkingDirectory="$(BuildPath)" />
+          
+    <Delete Files="@(FilesToDelete)" />
+    <RemoveDir Directories="@(DirectoriesToDelete)" />
+  </Target>
+
+</Project>

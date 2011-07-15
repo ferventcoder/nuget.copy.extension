@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>nuget.copy.extension</id>
+    <title>Nuget Copy Extension</title>
+    <version>1.0</version>
+    <authors>Rob Reynolds</authors>
+    <owners>Rob Reynolds</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/ferventcoder/nuget.copy.extension</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Copy a package from one source to another.</summary>
+    <description>This adds copy to the command line. "nuget.exe copy packageId [-Version version] [-Source sourceFeed] [-Destination destinationPathOrFeed]] [-ApiKey apiKey]" | To use this package, please install NuGet Extend first (http://nuget.org/list/packages/addconsoleextension) and then run nuget.exe addExtension nuget.copyextension.</description>
+    <tags>extension nuget command copy packages ConsoleExtension</tags>
+  </metadata>
+</package>
