@@ -6,10 +6,14 @@ This adds copy to the nuget.exe command line.
 This will also copy all dependent packages.  
 
 #Install
-To use this package, please install [NuGet Extend](http://nuget.org/list/packages/addconsoleextension) first and then run  
-
-`nuget.exe addExtension nuget.copy.extension`  
-
+To use this package, please install [NuGet Extend](http://nuget.org/list/packages/addconsoleextension) first:  
+  
+`nuget install /ExcludeVersion /OutputDir %LocalAppData%\NuGet\Commands AddConsoleExtension`  
+  
+Then to install nuget copy, run the following command:  
+  
+`nuget addExtension nuget.copy.extension`  
+  
 #Parameters
 ###PackageId
 Name of package in source feed to copy to destination feed.  
