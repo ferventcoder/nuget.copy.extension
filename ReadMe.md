@@ -29,3 +29,13 @@ Defaults to local directory.
 ###ApiKey (optional)
 The ApiKey if not already set (or just if you want to)  
 Defaults to the one you have set or throws an error if you do not have one set and do not pass this parameter.  
+  
+#Examples
+`nuget copy castle.windsor`  
+  
+`nuget copy castle.windsor -destination http://nuget.mycompany.com/nuget`  
+  
+`nuget copy castle.windsor -destination C:\files`  
+  
+`nuget copy castle.windsor -destination \\companyshare\nuget`  
+  
