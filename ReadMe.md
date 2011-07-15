@@ -1,7 +1,7 @@
 # NuGet Copy Extension
 This adds copy to the nuget.exe command line.  
 
-`nuget.exe copy packageId [-Version version] [-Source sourceFeed] [-Destination destinationPathOrFeed]] [-ApiKey apiKey]`  
+`nuget.exe copy packageId [-Version version] [-Source sourceFeed] [-Destination destinationPathOrFeed] [-ApiKey apiKey]`  
   
 This will also copy all dependent packages.  
 
