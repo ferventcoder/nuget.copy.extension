@@ -22,14 +22,14 @@ namespace NuGet.Copy {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class CopyResources {
+    internal class CopyTagsResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal CopyResources() {
+        internal CopyTagsResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace NuGet.Copy {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NuGet.Copy.CopyResources", typeof(CopyResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NuGet.Copy.CopyTagsResources", typeof(CopyTagsResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,6 +61,15 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Get all versions of packages that meet the specified tag..
+        /// </summary>
+        internal static string AllVersionsDescription {
+            get {
+                return ResourceManager.GetString("AllVersionsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The API key for the destination (optional if already set).
         /// </summary>
         internal static string ApiKeyDescription {
@@ -70,7 +79,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copies a package from one source to another source.
+        ///   Looks up a localized string similar to Copies all packages with a tag (up to 500) from one source to another source.
         /// </summary>
         internal static string Description {
             get {
@@ -79,7 +88,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The location to copy the package..
+        ///   Looks up a localized string similar to The location to copy the package(s) with the specified tag..
         /// </summary>
         internal static string DestinationDescription {
             get {
@@ -88,7 +97,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A list of package sources to use for finding the package..
+        ///   Looks up a localized string similar to A list of package sources to use in finding the package(s) with specified tag..
         /// </summary>
         internal static string SourceDescription {
             get {
@@ -97,7 +106,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specify the id of a package and the destination feed to copy the package to. Optionally specify a source if not the official to copy from..
+        ///   Looks up a localized string similar to Specify the tagId and the destination feed to copy the package to..
         /// </summary>
         internal static string UsageDescription {
             get {
@@ -106,20 +115,11 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to packageId [options].
+        ///   Looks up a localized string similar to tagId [options].
         /// </summary>
         internal static string UsageSummary {
             get {
                 return ResourceManager.GetString("UsageSummary", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The version of the package to install..
-        /// </summary>
-        internal static string VersionDescription {
-            get {
-                return ResourceManager.GetString("VersionDescription", resourceCulture);
             }
         }
     }

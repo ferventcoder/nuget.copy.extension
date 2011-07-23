@@ -7,11 +7,12 @@ namespace NuGet.Copy
     using Commands;
     using Common;
 
-    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
+    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary",UsageDescriptionResourceName = "UsageDescription")]
     public class Copy : Command
     {
         private readonly IPackageRepositoryFactory _repositoryFactory;
         private readonly IPackageSourceProvider _sourceProvider;
+        private IList<string> _sources = new List<string>();
         private readonly string _workDirectory;
 
         [ImportingConstructor]
@@ -22,8 +23,15 @@ namespace NuGet.Copy
             _workDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NugetCopyExtensionWork");
         }
 
-        [Option(typeof(CopyResources), "SourceDescription", AltName = "src")]
-        public string Source { get; set; }
+        [Option(typeof(CopyTagsResources), "SourceDescription", AltName = "src")]
+        public IList<string> Source
+        {
+            get { return _sources; }
+            set { _sources = value; }
+        }
+
+        //[Option(typeof(CopyTagsResources), "SourceDescription", AltName = "src")]
+        //public string Source { get; set; }
 
         [Option(typeof(CopyResources), "DestinationDescription", AltName = "dest")]
         public string Destination { get; set; }
@@ -36,27 +44,18 @@ namespace NuGet.Copy
 
         public override void ExecuteCommand()
         {
-            try
-            {
-                string packageId = base.Arguments[0];
+            CleanUpWorkDirectory(_workDirectory);
+            string packageId = base.Arguments[0];
 
-                PrepareDestination();
-                PrepareApiKey();
+            PrepareDestination();
+            PrepareApiKey();
 
-                Console.WriteLine("Copying {0} from {1} to {2}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version, string.IsNullOrEmpty(Source) ? "any source" : Source, Destination);
+            Console.WriteLine("Copying {0} from {1} to {2}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version,
+                              Source.Count == 0 ? "any source" : string.Join(";", Source), Destination);
 
-                CreateWorkDirectoryIfNotExists(_workDirectory);
-                InstallPackageLocally(packageId, _workDirectory);
-                PushToDestination(_workDirectory);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                CleanUpWorkDirectory(_workDirectory);
-            }
+            CreateWorkDirectoryIfNotExists(_workDirectory);
+            InstallPackageLocally(packageId, _workDirectory);
+            PushToDestination(_workDirectory);
         }
 
         private void PrepareDestination()
@@ -101,6 +100,11 @@ namespace NuGet.Copy
             InstallCommand install = new InstallCommand(_repositoryFactory, _sourceProvider);
             install.Arguments.Add(packageId);
             install.OutputDirectory = workDirectory;
+            install.Console = this.Console;
+            foreach (var source in Source)
+            {
+                install.Source.Add(source);
+            }
             if (!string.IsNullOrEmpty(Version))
             {
                 install.Version = Version;
@@ -138,6 +142,7 @@ namespace NuGet.Copy
         private void PushToDestinationDirectory(string packagePath)
         {
             File.Copy(Path.GetFullPath(packagePath), Path.Combine(Destination, Path.GetFileName(packagePath)), true);
+            Console.WriteLine("Completed copying '{0}' to '{1}'", Path.GetFileName(packagePath), Destination);
         }
 
         private void PushToDestinationRemote(string packagePath)
@@ -147,13 +152,14 @@ namespace NuGet.Copy
                 //PushCommand push = new PushCommand(_sourceProvider);
                 //push.Arguments.Add(Path.GetFullPath(packagePath));
                 //push.Source = _sourceProvider.ResolveSource(Destination);
+                //push.Console = this.Console;
                 //push.ExecuteCommand();
 
                 PushPackage(Path.GetFullPath(packagePath), Destination, ApiKey);
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine("Copy encountered an issue. Perhaps the package already exists? {0}{1}", Environment.NewLine, ex.ToString());
+                Console.WriteLine("Copy encountered an issue. Perhaps the package already exists? {0}{1}", Environment.NewLine, ex);
             }
         }
 

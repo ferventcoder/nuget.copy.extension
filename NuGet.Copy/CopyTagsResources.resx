@@ -117,25 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllVersionsDescription" xml:space="preserve">
+    <value>Get all versions of packages that meet the specified tag.</value>
+  </data>
   <data name="ApiKeyDescription" xml:space="preserve">
     <value>The API key for the destination (optional if already set)</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Copies a package from one source to another source</value>
+    <value>Copies all packages with a tag (up to 500) from one source to another source</value>
   </data>
   <data name="DestinationDescription" xml:space="preserve">
-    <value>The location to copy the package.</value>
+    <value>The location to copy the package(s) with the specified tag.</value>
   </data>
   <data name="SourceDescription" xml:space="preserve">
-    <value>A list of package sources to use for finding the package.</value>
+    <value>A list of package sources to use in finding the package(s) with specified tag.</value>
   </data>
   <data name="UsageDescription" xml:space="preserve">
-    <value>Specify the id of a package and the destination feed to copy the package to. Optionally specify a source if not the official to copy from.</value>
+    <value>Specify the tagId and the destination feed to copy the package to.</value>
   </data>
   <data name="UsageSummary" xml:space="preserve">
-    <value>packageId [options]</value>
-  </data>
-  <data name="VersionDescription" xml:space="preserve">
-    <value>The version of the package to install.</value>
+    <value>tagId [options]</value>
   </data>
 </root>
