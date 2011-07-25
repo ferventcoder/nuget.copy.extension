@@ -7,12 +7,13 @@ namespace NuGet.Copy
     using Commands;
     using Common;
 
-    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary",UsageDescriptionResourceName = "UsageDescription")]
+    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
     public class Copy : Command
     {
         private readonly IPackageRepositoryFactory _repositoryFactory;
         private readonly IPackageSourceProvider _sourceProvider;
         private IList<string> _sources = new List<string>();
+        private IList<string> _destinations = new List<string>();
         private readonly string _workDirectory;
 
         [ImportingConstructor]
@@ -27,14 +28,19 @@ namespace NuGet.Copy
         public IList<string> Source
         {
             get { return _sources; }
-            set { _sources = value; }
         }
 
         //[Option(typeof(CopyTagsResources), "SourceDescription", AltName = "src")]
         //public string Source { get; set; }
 
         [Option(typeof(CopyResources), "DestinationDescription", AltName = "dest")]
-        public string Destination { get; set; }
+        public IList<string> Destination
+        {
+            get { return _destinations; }
+        }
+
+        //[Option(typeof(CopyResources), "DestinationDescription", AltName = "dest")]
+        //public string Destination { get; set; }
 
         [Option(typeof(CopyResources), "VersionDescription")]
         public string Version { get; set; }
@@ -46,43 +52,99 @@ namespace NuGet.Copy
         {
             CleanUpWorkDirectory(_workDirectory);
             string packageId = base.Arguments[0];
+            PrepareSources();
+            PrepareDestinations();
 
-            PrepareDestination();
-            PrepareApiKey();
+            PreventApiKeyBeingSpecifiedWhenMultipleRemoteSources();
 
-            Console.WriteLine("Copying {0} from {1} to {2}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version,
-                              Source.Count == 0 ? "any source" : string.Join(";", Source), Destination);
+            Console.WriteLine("Copying {0} and all of its dependent packages from {1} to {2}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version,
+                                              Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
 
             CreateWorkDirectoryIfNotExists(_workDirectory);
             InstallPackageLocally(packageId, _workDirectory);
-            PushToDestination(_workDirectory);
+
+            foreach (string dest in Destination)
+            {
+                PrepareApiKey(dest);
+                PushToDestination(_workDirectory,dest);
+            }
         }
 
-        private void PrepareDestination()
+        private void PrepareSources()
         {
-            if (IsDirectory(Destination))
+            if (Source.Count == 0)
             {
-                //destination is current directory
-                if (string.IsNullOrEmpty(Destination) || Destination == ".")
-                {
-                    Destination = Directory.GetCurrentDirectory();
-                }
+                Source.Add(".");
+            }
 
-                // not a UNC Path
-                if (!Destination.StartsWith(@"\\"))
+            for (int i = 0; i < Source.Count; i++)
+            {
+                if (IsDirectory(Source[i]))
                 {
-                    Destination = Path.GetFullPath(Destination);
+                    //destination is current directory
+                    if (string.IsNullOrWhiteSpace(Source[i]) || Source[i] == ".")
+                    {
+                        Source[i] = Directory.GetCurrentDirectory();
+                    }
+
+                    // not a UNC Path
+                    if (!Source[i].StartsWith(@"\\"))
+                    {
+                        Source[i] = Path.GetFullPath(Source[i]);
+                    }
+                }
+            }
+        }      
+        
+        private void PrepareDestinations()
+        {
+            if (Destination.Count == 0)
+            {
+                Destination.Add(".");
+            }
+
+            for (int i = 0; i < Destination.Count; i++)
+            {
+                if (IsDirectory(Destination[i]))
+                {
+                    //destination is current directory
+                    if (string.IsNullOrWhiteSpace(Destination[i]) || Destination[i] == ".")
+                    {
+                        Destination[i] = Directory.GetCurrentDirectory();
+                    }
+
+                    // not a UNC Path
+                    if (!Destination[i].StartsWith(@"\\"))
+                    {
+                        Destination[i] = Path.GetFullPath(Destination[i]);
+                    }
                 }
             }
         }
 
-        private void PrepareApiKey()
+        private void PreventApiKeyBeingSpecifiedWhenMultipleRemoteSources()
         {
-            if (!IsDirectory(Destination))
+            var remoteCount = 0;
+            foreach (string dest in Destination)
+            {
+                if (!IsDirectory(dest))
+                {
+                    remoteCount += 1;
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(ApiKey) && remoteCount > 1)
+            {
+                throw new ApplicationException("ApiKey cannot be set if you specify multiple remote destinations. Please consider using nuget 'setApiKey' command and then running this command without the ApiKey parameter set.");
+            }
+        }
+
+        private void PrepareApiKey(string destination)
+        {
+            if (!IsDirectory(destination))
             {
                 if (string.IsNullOrEmpty(ApiKey))
                 {
-                    ApiKey = GetApiKey(_sourceProvider, Settings.UserSettings, Destination, true);
+                    ApiKey = GetApiKey(_sourceProvider, Settings.UserSettings, destination, true);
                 }
             }
         }
@@ -113,18 +175,18 @@ namespace NuGet.Copy
             install.ExecuteCommand();
         }
 
-        private void PushToDestination(string workDirectory)
+        private void PushToDestination(string workDirectory, string destination)
         {
             IList<string> PackagePaths = GetPackages(workDirectory);
             foreach (var packagePath in PackagePaths)
             {
-                if (IsDirectory(Destination))
+                if (IsDirectory(destination))
                 {
-                    PushToDestinationDirectory(packagePath);
+                    PushToDestinationDirectory(packagePath, destination);
                 }
                 else
                 {
-                    PushToDestinationRemote(packagePath);
+                    PushToDestinationRemote(packagePath, destination);
                 }
             }
         }
@@ -136,16 +198,16 @@ namespace NuGet.Copy
 
         private bool IsDirectory(string destination)
         {
-            return string.IsNullOrEmpty(destination) || destination.Contains(@"\");
+            return string.IsNullOrWhiteSpace(destination) || destination.Contains(@"\") || destination == ".";
         }
 
-        private void PushToDestinationDirectory(string packagePath)
+        private void PushToDestinationDirectory(string packagePath, string destination)
         {
-            File.Copy(Path.GetFullPath(packagePath), Path.Combine(Destination, Path.GetFileName(packagePath)), true);
-            Console.WriteLine("Completed copying '{0}' to '{1}'", Path.GetFileName(packagePath), Destination);
+            File.Copy(Path.GetFullPath(packagePath), Path.Combine(destination, Path.GetFileName(packagePath)), true);
+            Console.WriteLine("Completed copying '{0}' to '{1}'", Path.GetFileName(packagePath), destination);
         }
 
-        private void PushToDestinationRemote(string packagePath)
+        private void PushToDestinationRemote(string packagePath, string destination)
         {
             try
             {
@@ -155,7 +217,7 @@ namespace NuGet.Copy
                 //push.Console = this.Console;
                 //push.ExecuteCommand();
 
-                PushPackage(Path.GetFullPath(packagePath), Destination, ApiKey);
+                PushPackage(Path.GetFullPath(packagePath), destination, ApiKey);
             }
             catch (Exception ex)
             {

@@ -7,6 +7,7 @@
     using System.Linq;
     using Commands;
     using Common;
+    using Console = Common.Console;
 
     [Command(typeof(CopyTagsResources), "copyTags", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
     public class CopyTags : Command
@@ -14,6 +15,7 @@
         private readonly IPackageRepositoryFactory _repositoryFactory;
         private readonly IPackageSourceProvider _sourceProvider;
         private IList<string> _sources = new List<string>();
+        private IList<string> _destinations = new List<string>();
 
         [ImportingConstructor]
         public CopyTags(IPackageRepositoryFactory repositoryFactory, IPackageSourceProvider sourceProvider)
@@ -30,28 +32,54 @@
         }
 
         [Option(typeof(CopyTagsResources), "DestinationDescription", AltName = "dest")]
-        public string Destination { get; set; }
+        public IList<string> Destination
+        {
+            get { return _destinations; }
+            set { _destinations = value; }
+        }
+
+        //[Option(typeof(CopyTagsResources), "DestinationDescription", AltName = "dest")]
+        //public string Destination { get; set; }
 
         [Option(typeof(CopyTagsResources), "ApiKeyDescription", AltName = "api")]
         public string ApiKey { get; set; }
 
-        [Option(typeof(CopyTagsResources), "AllVersionsDescription",AltName="all")]
+        [Option(typeof(CopyTagsResources), "AllVersionsDescription", AltName = "all")]
         public bool AllVersions { get; set; }
 
         public override void ExecuteCommand()
         {
             string tagId = base.Arguments[0];
-            PrepareDestination();
+            PrepareSources();
+            PrepareDestinations();
 
-            Console.WriteLine("Copying all packages with '{0}' tag from {1} to {2}.", tagId, "official nuget feed", Destination);
+            Console.WriteLine("Copying all packages with '{0}' tag from {1} to {2}.", tagId, Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
 
-            var packages = GetPackages(tagId);
+            IEnumerable<IPackage> packages = new List<IPackage>();
+            try
+            {
+                packages = GetPackages(tagId);
+                Console.WriteLine("Retrieved {0} packages, not counting dependencies for copying from one or more sources to one or more destinations.", packages.Count());
+            }
+            catch (Exception)
+            {
+                Console.WriteError("Oopsy!");
+                throw;
+            }
 
             Copy copy = new Copy(_repositoryFactory, _sourceProvider);
             copy.Console = this.Console;
             copy.ApiKey = ApiKey;
-            copy.Source = Source;
-            copy.Destination = Destination;
+            foreach (string src in Source)
+            {
+                copy.Source.Add(src);
+            }
+            foreach (string dest in Destination)
+            {
+                copy.Destination.Add(dest);
+            }
+
+            IList<string> report = new List<string>();
 
             foreach (IPackage package in packages)
             {
@@ -64,9 +92,13 @@
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteError("Had an error getting package '{0} - {1}': {2}",package.Id,package.Version.ToString(),ex.Message);
+                    string message = string.Format("Had an error getting package '{0} - {1}': {2}", package.Id, package.Version.ToString(), ex.Message);
+                    Console.WriteError(message);
+                    report.Add(message);
                 }
             }
+
+            PrintReport(tagId, report);
         }
 
         //private string PrepareUrl(string tagId)
@@ -78,35 +110,68 @@
 
         //}
 
-        private void PrepareDestination()
+        private void PrepareSources()
         {
-            if (IsDirectory(Destination))
+            if (Source.Count == 0)
             {
-                // destination is current directory
-                if (string.IsNullOrEmpty(Destination) || Destination == ".")
-                {
-                    Destination = Directory.GetCurrentDirectory();
-                }
+                Source.Add(".");
+            }
 
-                // not a UNC Path
-                if (!Destination.StartsWith(@"\\"))
+            for (int i = 0; i < Source.Count; i++)
+            {
+                if (IsDirectory(Source[i]))
                 {
-                    Destination = Path.GetFullPath(Destination);
+                    //destination is current directory
+                    if (string.IsNullOrWhiteSpace(Source[i]) || Source[i] == ".")
+                    {
+                        Source[i] = Directory.GetCurrentDirectory();
+                    }
+
+                    // not a UNC Path
+                    if (!Source[i].StartsWith(@"\\"))
+                    {
+                        Source[i] = Path.GetFullPath(Source[i]);
+                    }
+                }
+            }
+        }   
+
+        private void PrepareDestinations()
+        {
+            if (Destination.Count == 0)
+            {
+                Destination.Add(".");
+            }
+
+            for (int i = 0; i < Destination.Count; i++)
+            {
+                if (IsDirectory(Destination[i]))
+                {
+                    //destination is current directory
+                    if (string.IsNullOrWhiteSpace(Destination[i]) || Destination[i] == ".")
+                    {
+                        Destination[i] = Directory.GetCurrentDirectory();
+                    }
+
+                    // not a UNC Path
+                    if (!Destination[i].StartsWith(@"\\"))
+                    {
+                        Destination[i] = Path.GetFullPath(Destination[i]);
+                    }
                 }
             }
         }
 
         private bool IsDirectory(string destination)
         {
-            return string.IsNullOrEmpty(destination) || destination.Contains(@"\");
+            return string.IsNullOrWhiteSpace(destination) || destination.Contains(@"\") || destination == ".";
         }
 
         public IEnumerable<IPackage> GetPackages(string tagId)
         {
             IQueryable<IPackage> packages = GetRepository().GetPackages().OrderBy(p => p.Id).Where(p => p.Tags.Contains(tagId));
-            //IPackageRepository packageRepository = GetRepository();
-            //IQueryable<IPackage> packages = packageRepository.GetPackages().OrderBy(p => p.Id).Where(p => p.Tags.Contains(tagId));
-            //return packages;
+            
+            //packages.Find(); //.Where(p => p.Tags.Contains(tagId));
             if (AllVersions)
             {
                 // Do not collapse versions
@@ -121,6 +186,22 @@
             AggregateRepository repository = AggregateRepositoryHelper.CreateAggregateRepositoryFromSources(_repositoryFactory, _sourceProvider, Source);
             repository.Logger = base.Console;
             return repository;
+        }
+
+        private void PrintReport(string tagId, IList<string> report)
+        {
+            if (report.Count != 0)
+            {
+                Console.WriteWarning("Finished copying all packages with tag {0} except where the following errors occurred:", tagId);
+                foreach (string line in report)
+                {
+                    Console.WriteWarning("  " + line);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Finished copying all packages with tag {0} successfully.", tagId);
+            }
         }
     }
 }

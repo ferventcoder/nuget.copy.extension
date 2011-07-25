@@ -79,7 +79,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The location to copy the package..
+        ///   Looks up a localized string similar to The location(s) to copy the package..
         /// </summary>
         internal static string DestinationDescription {
             get {

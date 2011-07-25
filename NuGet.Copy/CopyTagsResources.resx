@@ -127,13 +127,13 @@
     <value>Copies all packages with a tag (up to 500) from one source to another source</value>
   </data>
   <data name="DestinationDescription" xml:space="preserve">
-    <value>The location to copy the package(s) with the specified tag.</value>
+    <value>The location(s) to copy packages with the specified tag.</value>
   </data>
   <data name="SourceDescription" xml:space="preserve">
     <value>A list of package sources to use in finding the package(s) with specified tag.</value>
   </data>
   <data name="UsageDescription" xml:space="preserve">
-    <value>Specify the tagId and the destination feed to copy the package to.</value>
+    <value>Specify the tagId, the source(s) and the destination feed(s) to copy packages with the tag.</value>
   </data>
   <data name="UsageSummary" xml:space="preserve">
     <value>tagId [options]</value>

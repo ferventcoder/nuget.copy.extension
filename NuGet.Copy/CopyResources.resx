@@ -124,7 +124,7 @@
     <value>Copies a package from one source to another source</value>
   </data>
   <data name="DestinationDescription" xml:space="preserve">
-    <value>The location to copy the package.</value>
+    <value>The location(s) to copy the package.</value>
   </data>
   <data name="SourceDescription" xml:space="preserve">
     <value>A list of package sources to use for finding the package.</value>

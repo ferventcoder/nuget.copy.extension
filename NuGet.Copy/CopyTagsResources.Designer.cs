@@ -88,7 +88,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The location to copy the package(s) with the specified tag..
+        ///   Looks up a localized string similar to The location(s) to copy packages with the specified tag..
         /// </summary>
         internal static string DestinationDescription {
             get {
@@ -106,7 +106,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specify the tagId and the destination feed to copy the package to..
+        ///   Looks up a localized string similar to Specify the tagId, the source(s) and the destination feed(s) to copy packages with the tag..
         /// </summary>
         internal static string UsageDescription {
             get {
