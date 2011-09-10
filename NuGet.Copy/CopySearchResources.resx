@@ -118,24 +118,24 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AllVersionsDescription" xml:space="preserve">
-    <value>Get all versions of packages that meet the specified tag.</value>
+    <value>Get all versions of packages that meet the specified search result.</value>
   </data>
   <data name="ApiKeyDescription" xml:space="preserve">
     <value>The API key for the destination (optional if already set)</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Copies all packages with a tag (up to 500) from one source to another source</value>
+    <value>Copies all packages with search result (up to 500) from one source to another source</value>
   </data>
   <data name="DestinationDescription" xml:space="preserve">
-    <value>The location(s) to copy packages with the specified tag.</value>
+    <value>The location(s) to copy packages with the specified search result.</value>
   </data>
   <data name="SourceDescription" xml:space="preserve">
-    <value>A list of package sources to use in finding the package(s) with specified tag.</value>
+    <value>A list of package sources to use in finding the package(s) with specified search result.</value>
   </data>
   <data name="UsageDescription" xml:space="preserve">
-    <value>Specify the tagId, the source(s) and the destination feed(s) to copy packages with the tag.</value>
+    <value>Specify the searchFilter, the source(s) and the destination feed(s) to copy packages with the search result.</value>
   </data>
   <data name="UsageSummary" xml:space="preserve">
-    <value>tagId [options]</value>
+    <value>searchFilter [options]</value>
   </data>
 </root>

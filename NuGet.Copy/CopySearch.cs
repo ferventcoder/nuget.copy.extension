@@ -9,8 +9,8 @@
     using Common;
     using Console = Common.Console;
 
-    [Command(typeof(CopyTagsResources), "copyTags", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
-    public class CopyTags : Command
+    [Command(typeof(CopySearchResources), "copySearch", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
+    public class CopySearch : Command
     {
         private readonly IPackageRepositoryFactory _repositoryFactory;
         private readonly IPackageSourceProvider _sourceProvider;
@@ -18,47 +18,47 @@
         private IList<string> _destinations = new List<string>();
 
         [ImportingConstructor]
-        public CopyTags(IPackageRepositoryFactory repositoryFactory, IPackageSourceProvider sourceProvider)
+        public CopySearch(IPackageRepositoryFactory repositoryFactory, IPackageSourceProvider sourceProvider)
         {
             _repositoryFactory = repositoryFactory;
             _sourceProvider = sourceProvider;
         }
 
-        [Option(typeof(CopyTagsResources), "SourceDescription", AltName = "src")]
+        [Option(typeof(CopySearchResources), "SourceDescription", AltName = "src")]
         public IList<string> Source
         {
             get { return _sources; }
             set { _sources = value; }
         }
 
-        [Option(typeof(CopyTagsResources), "DestinationDescription", AltName = "dest")]
+        [Option(typeof(CopySearchResources), "DestinationDescription", AltName = "dest")]
         public IList<string> Destination
         {
             get { return _destinations; }
             set { _destinations = value; }
         }
 
-        //[Option(typeof(CopyTagsResources), "DestinationDescription", AltName = "dest")]
+        //[Option(typeof(CopySearchResources), "DestinationDescription", AltName = "dest")]
         //public string Destination { get; set; }
 
-        [Option(typeof(CopyTagsResources), "ApiKeyDescription", AltName = "api")]
+        [Option(typeof(CopySearchResources), "ApiKeyDescription", AltName = "api")]
         public string ApiKey { get; set; }
 
-        [Option(typeof(CopyTagsResources), "AllVersionsDescription", AltName = "all")]
+        [Option(typeof(CopySearchResources), "AllVersionsDescription", AltName = "all")]
         public bool AllVersions { get; set; }
 
         public override void ExecuteCommand()
         {
-            string tagId = base.Arguments[0];
+            string searchId = base.Arguments[0];
             PrepareSources();
             PrepareDestinations();
 
-            Console.WriteLine("Copying all packages with '{0}' tag from {1} to {2}.", tagId, Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
+            Console.WriteLine("Copying all packages with '{0}' from {1} to {2}.", searchId, Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
 
             IEnumerable<IPackage> packages = new List<IPackage>();
             try
             {
-                packages = GetPackages(tagId);
+                packages = GetPackages(searchId);
                 Console.WriteLine("Retrieved {0} packages, not counting dependencies for copying from one or more sources to one or more destinations.", packages.Count());
             }
             catch (Exception)
@@ -98,14 +98,14 @@
                 }
             }
 
-            PrintReport(tagId, report);
+            PrintReport(searchId, report);
         }
 
-        //private string PrepareUrl(string tagId)
+        //private string PrepareUrl(string searchFilter)
         //{
         //    return string.Format(
         //            "http://packages.nuget.org/v1/FeedService.svc/Packages()?$filter=(Tags%20ne%20null)%20and%20substringof('%20{0}%20',tolower(Tags))&$top=500",
-        //            tagId);
+        //            searchFilter);
         //    //http://packages.nuget.org/v1/FeedService.svc/Packages()?$filter=(Tags%20ne%20null)%20and%20substringof('%20chocolatey%20',tolower(Tags))&$top=500
 
         //}
@@ -167,11 +167,13 @@
             return string.IsNullOrWhiteSpace(destination) || destination.Contains(@"\") || destination == ".";
         }
 
-        public IEnumerable<IPackage> GetPackages(string tagId)
+        public IEnumerable<IPackage> GetPackages(string searchFilter)
         {
-            IQueryable<IPackage> packages = GetRepository().GetPackages().OrderBy(p => p.Id).Where(p => p.Tags.Contains(tagId));
+            IQueryable<IPackage> packages = GetRepository().GetPackages().OrderBy(p => p.Id); //.Where(p => p.Tags.Contains(searchFilter));
+            //packages.Find(); //.Where(p => p.Tags.Contains(searchFilter));
+
+            packages = packages.Find(new string[] {searchFilter});
             
-            //packages.Find(); //.Where(p => p.Tags.Contains(tagId));
             if (AllVersions)
             {
                 // Do not collapse versions
@@ -188,11 +190,11 @@
             return repository;
         }
 
-        private void PrintReport(string tagId, IList<string> report)
+        private void PrintReport(string searchFilter, IList<string> report)
         {
             if (report.Count != 0)
             {
-                Console.WriteWarning("Finished copying all packages with tag {0} except where the following errors occurred:", tagId);
+                Console.WriteWarning("Finished copying all packages with searchFilter '{0}' except where the following errors occurred:", searchFilter);
                 foreach (string line in report)
                 {
                     Console.WriteWarning("  " + line);
@@ -200,7 +202,7 @@
             }
             else
             {
-                Console.WriteLine("Finished copying all packages with tag {0} successfully.", tagId);
+                Console.WriteLine("Finished copying all packages with searchFilter '{0}' successfully.", searchFilter);
             }
         }
     }

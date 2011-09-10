@@ -44,9 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CopyTags.cs" />
-    <Compile Include="CopyTagsResources.Designer.cs">
-      <DependentUpon>CopyTagsResources.resx</DependentUpon>
+    <Compile Include="CopySearch.cs" />
+    <Compile Include="CopySearchResources.Designer.cs">
+      <DependentUpon>CopySearchResources.resx</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
@@ -59,9 +59,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CopyTagsResources.resx">
+    <EmbeddedResource Include="CopySearchResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>CopyTagsResources.Designer.cs</LastGenOutput>
+      <LastGenOutput>CopySearchResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="CopyResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

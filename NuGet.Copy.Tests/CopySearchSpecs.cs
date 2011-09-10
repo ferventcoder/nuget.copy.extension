@@ -6,11 +6,11 @@
     using Console = Common.Console;
 
 
-    public class CopyTagsSpecs
+    public class CopySearchSpecs
     {
         public abstract class CopyTagsSpecsBase : TinySpec
         {
-            protected CopyTags command;
+            protected CopySearch command;
             protected string sourceDir1 = @".\source1";
             protected string sourceDir2 = @".\source2";
             protected string destDir1 = @".\dest1";
@@ -28,7 +28,7 @@
                 IPackageSourceProvider sourceProvider = new PackageSourceProvider(Settings.UserSettings, new[] { defaultPackageSource });
                 IPackageRepositoryFactory repositoryFactory = new NuGet.Common.CommandLineRepositoryFactory();
 
-                command = new CopyTags(repositoryFactory, sourceProvider);
+                command = new CopySearch(repositoryFactory, sourceProvider);
                 command.Console = new Console();
             }
 

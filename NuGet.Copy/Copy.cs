@@ -24,13 +24,13 @@ namespace NuGet.Copy
             _workDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NugetCopyExtensionWork");
         }
 
-        [Option(typeof(CopyTagsResources), "SourceDescription", AltName = "src")]
+        [Option(typeof(CopySearchResources), "SourceDescription", AltName = "src")]
         public IList<string> Source
         {
             get { return _sources; }
         }
 
-        //[Option(typeof(CopyTagsResources), "SourceDescription", AltName = "src")]
+        //[Option(typeof(CopyResources), "SourceDescription", AltName = "src")]
         //public string Source { get; set; }
 
         [Option(typeof(CopyResources), "DestinationDescription", AltName = "dest")]

@@ -22,14 +22,14 @@ namespace NuGet.Copy {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class CopyTagsResources {
+    internal class CopySearchResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal CopyTagsResources() {
+        internal CopySearchResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace NuGet.Copy {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NuGet.Copy.CopyTagsResources", typeof(CopyTagsResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NuGet.Copy.CopySearchResources", typeof(CopySearchResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Get all versions of packages that meet the specified tag..
+        ///   Looks up a localized string similar to Get all versions of packages that meet the specified search result..
         /// </summary>
         internal static string AllVersionsDescription {
             get {
@@ -79,7 +79,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copies all packages with a tag (up to 500) from one source to another source.
+        ///   Looks up a localized string similar to Copies all packages with search result (up to 500) from one source to another source.
         /// </summary>
         internal static string Description {
             get {
@@ -88,7 +88,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The location(s) to copy packages with the specified tag..
+        ///   Looks up a localized string similar to The location(s) to copy packages with the specified search result..
         /// </summary>
         internal static string DestinationDescription {
             get {
@@ -97,7 +97,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A list of package sources to use in finding the package(s) with specified tag..
+        ///   Looks up a localized string similar to A list of package sources to use in finding the package(s) with specified search result..
         /// </summary>
         internal static string SourceDescription {
             get {
@@ -106,7 +106,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specify the tagId, the source(s) and the destination feed(s) to copy packages with the tag..
+        ///   Looks up a localized string similar to Specify the searchFilter, the source(s) and the destination feed(s) to copy packages with the search result..
         /// </summary>
         internal static string UsageDescription {
             get {
@@ -115,7 +115,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to tagId [options].
+        ///   Looks up a localized string similar to searchFilter [options].
         /// </summary>
         internal static string UsageSummary {
             get {
