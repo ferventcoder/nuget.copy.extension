@@ -9,14 +9,13 @@ namespace NuGet.Clone
     using NuGet.Copy;
     using System.Linq;
 
-    [Command(typeof(CloneResources), "clone", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
+    [Command(typeof(CloneResources), "clone", "Description", MinArgs = 0, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
     public class Clone : Command
     {
         private readonly IPackageRepositoryFactory _repositoryFactory;
         private readonly IPackageSourceProvider _sourceProvider;
         private IList<string> _sources = new List<string>();
         private IList<string> _destinations = new List<string>();
-        private readonly string _workDirectory;
 
         [ImportingConstructor]
         public Clone(IPackageRepositoryFactory repositoryFactory, IPackageSourceProvider sourceProvider)
@@ -81,17 +80,21 @@ namespace NuGet.Clone
 
         public IEnumerable<IPackage> GetPackageList(bool allVersions, string id)
         {
+            bool singular = string.IsNullOrEmpty(id) ? false : true;
             ListCommand listCommand = new ListCommand(_repositoryFactory, _sourceProvider)
             {
                 AllVersions = allVersions,
                 Console = this.Console,
             };
-            if (!string.IsNullOrEmpty(id))
+            if (singular)
                 listCommand.Arguments.Add(id);
             var packages = listCommand.GetPackages();
 
             //listcommand doesnt return just the matching packages, so filter here...
-            return packages.Where(p => p.Id.ToLowerInvariant() == id.ToLowerInvariant());
+            if (singular)
+                return packages.Where(p => p.Id.ToLowerInvariant() == id.ToLowerInvariant());
+            else
+                return packages;
         }
     }
 }
