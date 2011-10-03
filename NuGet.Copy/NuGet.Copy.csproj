@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clone.cs" />
+    <Compile Include="CloneResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CloneResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="CopySearch.cs" />
     <Compile Include="CopySearchResources.Designer.cs">
       <DependentUpon>CopySearchResources.resx</DependentUpon>
@@ -61,6 +67,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CloneResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CloneResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="CopySearchResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CopySearchResources.Designer.cs</LastGenOutput>
@@ -75,6 +85,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetPath)" "$(LocalAppData)\Nuget\Commands\$(TargetFileName)" /y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

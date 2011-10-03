@@ -126,6 +126,9 @@
   <data name="DestinationDescription" xml:space="preserve">
     <value>The location(s) to copy the package.</value>
   </data>
+  <data name="RecursiveDescription" xml:space="preserve">
+    <value>Recursively copy all package dependencies.</value>
+  </data>
   <data name="SourceDescription" xml:space="preserve">
     <value>A list of package sources to use for finding the package.</value>
   </data>

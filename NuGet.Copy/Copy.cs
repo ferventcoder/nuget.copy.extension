@@ -6,8 +6,9 @@ namespace NuGet.Copy
     using System.IO;
     using Commands;
     using Common;
+    using System.ComponentModel;
 
-    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
+    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 6, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
     public class Copy : Command
     {
         private readonly IPackageRepositoryFactory _repositoryFactory;
@@ -28,6 +29,7 @@ namespace NuGet.Copy
         public IList<string> Source
         {
             get { return _sources; }
+            set { _sources = value; }
         }
 
         //[Option(typeof(CopyResources), "SourceDescription", AltName = "src")]
@@ -37,7 +39,12 @@ namespace NuGet.Copy
         public IList<string> Destination
         {
             get { return _destinations; }
+            set { _destinations = value; }
         }
+
+        [DefaultValue(true)]
+        [Option(typeof(CopyResources), "RecursiveDescription", AltName = "r")]
+        public bool Recursive { get; set; }
 
         //[Option(typeof(CopyResources), "DestinationDescription", AltName = "dest")]
         //public string Destination { get; set; }
@@ -57,8 +64,9 @@ namespace NuGet.Copy
 
             PreventApiKeyBeingSpecifiedWhenMultipleRemoteSources();
 
-            Console.WriteLine("Copying {0} and all of its dependent packages from {1} to {2}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version,
-                                              Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
+            Console.WriteLine("Copying {0}{1} from {2} to {3}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version,
+                Recursive ? " and all of its dependent packages" : string.Empty,
+                Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
 
             CreateWorkDirectoryIfNotExists(_workDirectory);
             InstallPackageLocally(packageId, _workDirectory);
@@ -66,8 +74,14 @@ namespace NuGet.Copy
             foreach (string dest in Destination)
             {
                 PrepareApiKey(dest);
-                PushToDestination(_workDirectory,dest);
+                var packagePaths = GetPackages(_workDirectory, GetSearchFilter(Recursive, packageId));
+                PushToDestination(_workDirectory,dest, packagePaths);
             }
+        }
+
+        private string GetSearchFilter(bool recursive, string packageId)
+        {
+            return recursive ? "*.nupkg" : string.Format("{0}*.nupkg", packageId);
         }
 
         private void PrepareSources()
@@ -175,9 +189,8 @@ namespace NuGet.Copy
             install.ExecuteCommand();
         }
 
-        private void PushToDestination(string workDirectory, string destination)
+        private void PushToDestination(string workDirectory, string destination, IList<string> PackagePaths)
         {
-            IList<string> PackagePaths = GetPackages(workDirectory);
             foreach (var packagePath in PackagePaths)
             {
                 if (IsDirectory(destination))
@@ -191,9 +204,9 @@ namespace NuGet.Copy
             }
         }
 
-        private IList<string> GetPackages(string workDirectory)
+        private IList<string> GetPackages(string workDirectory, string searchFilter)
         {
-            return Directory.GetFiles(workDirectory, "*.nupkg", SearchOption.AllDirectories);
+            return Directory.GetFiles(workDirectory,searchFilter , SearchOption.AllDirectories);
         }
 
         private bool IsDirectory(string destination)
