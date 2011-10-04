@@ -74,14 +74,14 @@ namespace NuGet.Copy
             foreach (string dest in Destination)
             {
                 PrepareApiKey(dest);
-                var packagePaths = GetPackages(_workDirectory, GetSearchFilter(Recursive, packageId));
+                var packagePaths = GetPackages(_workDirectory, GetSearchFilter(Recursive, packageId, Version));
                 PushToDestination(_workDirectory,dest, packagePaths);
             }
         }
 
-        private string GetSearchFilter(bool recursive, string packageId)
+        private static string GetSearchFilter(bool recursive, string packageId, string version)
         {
-            return recursive ? "*.nupkg" : string.Format("{0}*.nupkg", packageId);
+            return recursive ? "*.nupkg" : string.Format("{0}.{1}.nupkg", packageId, version);
         }
 
         private void PrepareSources()
