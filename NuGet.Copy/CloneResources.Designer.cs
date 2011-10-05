@@ -22,14 +22,14 @@ namespace NuGet.Copy {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class CopyResources {
+    internal class CloneResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal CopyResources() {
+        internal CloneResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace NuGet.Copy {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NuGet.Copy.CopyResources", typeof(CopyResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NuGet.Copy.CloneResources", typeof(CloneResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -70,7 +70,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copies a package from one source to another source.
+        ///   Looks up a localized string similar to Clones either a package from one source to another source, or an entire source.
         /// </summary>
         internal static string Description {
             get {
@@ -88,15 +88,6 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Recursively copy all package dependencies..
-        /// </summary>
-        internal static string RecursiveDescription {
-            get {
-                return ResourceManager.GetString("RecursiveDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to A list of package sources to use for finding the package..
         /// </summary>
         internal static string SourceDescription {
@@ -106,7 +97,7 @@ namespace NuGet.Copy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specify the id of a package and the destination feed to copy the package to. Optionally specify a source if not the official to copy from..
+        ///   Looks up a localized string similar to Specify the id of a package and the destination feed to clone the package (including all historical builds) to. Optionally specify a source if not the official to copy from. If no package provided, the entire source feed will be cloned to the destination..
         /// </summary>
         internal static string UsageDescription {
             get {
@@ -120,15 +111,6 @@ namespace NuGet.Copy {
         internal static string UsageSummary {
             get {
                 return ResourceManager.GetString("UsageSummary", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The version of the package to install..
-        /// </summary>
-        internal static string VersionDescription {
-            get {
-                return ResourceManager.GetString("VersionDescription", resourceCulture);
             }
         }
         

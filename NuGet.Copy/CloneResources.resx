@@ -121,25 +121,19 @@
     <value>The API key for the destination (optional if already set)</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Copies a package from one source to another source</value>
+    <value>Clones either a package from one source to another source, or an entire source</value>
   </data>
   <data name="DestinationDescription" xml:space="preserve">
     <value>The location(s) to copy the package.</value>
-  </data>
-  <data name="RecursiveDescription" xml:space="preserve">
-    <value>Recursively copy all package dependencies.</value>
   </data>
   <data name="SourceDescription" xml:space="preserve">
     <value>A list of package sources to use for finding the package.</value>
   </data>
   <data name="UsageDescription" xml:space="preserve">
-    <value>Specify the id of a package and the destination feed to copy the package to. Optionally specify a source if not the official to copy from.</value>
+    <value>Specify the id of a package and the destination feed to clone the package (including all historical builds) to. Optionally specify a source if not the official to copy from. If no package provided, the entire source feed will be cloned to the destination.</value>
   </data>
   <data name="UsageSummary" xml:space="preserve">
     <value>packageId [options]</value>
-  </data>
-  <data name="VersionDescription" xml:space="preserve">
-    <value>The version of the package to install.</value>
   </data>
   <data name="WorkingDirectoryRootDescription" xml:space="preserve">
     <value>The working directory root for the copy operation</value>
