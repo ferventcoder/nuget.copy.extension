@@ -141,4 +141,7 @@
   <data name="VersionDescription" xml:space="preserve">
     <value>The version of the package to install.</value>
   </data>
+  <data name="WorkingDirectoryRootDescription" xml:space="preserve">
+    <value>The working directory root for the copy operation</value>
+  </data>
 </root>

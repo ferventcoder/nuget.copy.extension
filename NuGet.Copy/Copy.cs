@@ -8,21 +8,20 @@ namespace NuGet.Copy
     using Common;
     using System.ComponentModel;
 
-    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 6, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
+    [Command(typeof(CopyResources), "copy", "Description", MinArgs = 1, MaxArgs = 7, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
     public class Copy : Command
     {
         private readonly IPackageRepositoryFactory _repositoryFactory;
         private readonly IPackageSourceProvider _sourceProvider;
         private IList<string> _sources = new List<string>();
         private IList<string> _destinations = new List<string>();
-        private readonly string _workDirectory;
+        private string _workDirectory;
 
         [ImportingConstructor]
         public Copy(IPackageRepositoryFactory repositoryFactory, IPackageSourceProvider sourceProvider)
         {
             _repositoryFactory = repositoryFactory;
             _sourceProvider = sourceProvider;
-            _workDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NugetCopyExtensionWork");
         }
 
         [Option(typeof(CopySearchResources), "SourceDescription", AltName = "src")]
@@ -55,8 +54,15 @@ namespace NuGet.Copy
         [Option(typeof(CopyResources), "ApiKeyDescription", AltName = "api")]
         public string ApiKey { get; set; }
 
+        [Option(typeof(CloneResources), "WorkingDirectoryRootDescription", AltName = "workroot")]
+        public string WorkingDirectoryRoot { get; set; }
+
         public override void ExecuteCommand()
         {
+            _workDirectory = Path.Combine(string.IsNullOrEmpty(WorkingDirectoryRoot) ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) : WorkingDirectoryRoot, "NugetCopyExtensionWork");
+
+            Console.WriteLine(string.Format("Using working directory {0}", _workDirectory));
+
             CleanUpWorkDirectory(_workDirectory);
             string packageId = base.Arguments[0];
             PrepareSources();
@@ -64,9 +70,10 @@ namespace NuGet.Copy
 
             PreventApiKeyBeingSpecifiedWhenMultipleRemoteSources();
 
-            Console.WriteLine("Copying {0}{1} from {2} to {3}.", string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version,
-                Recursive ? " and all of its dependent packages" : string.Empty,
-                Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
+            Console.WriteLine("Copying {0}{1} from {2} to {3}.",
+                              string.IsNullOrEmpty(Version) ? packageId : packageId + " " + Version,
+                              Recursive ? " and all of its dependent packages" : string.Empty,
+                              Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
 
             CreateWorkDirectoryIfNotExists(_workDirectory);
             InstallPackageLocally(packageId, _workDirectory);
@@ -75,7 +82,7 @@ namespace NuGet.Copy
             {
                 PrepareApiKey(dest);
                 var packagePaths = GetPackages(_workDirectory, GetSearchFilter(Recursive, packageId, Version));
-                PushToDestination(_workDirectory,dest, packagePaths);
+                PushToDestination(_workDirectory, dest, packagePaths);
             }
         }
 
@@ -108,8 +115,8 @@ namespace NuGet.Copy
                     }
                 }
             }
-        }      
-        
+        }
+
         private void PrepareDestinations()
         {
             if (Destination.Count == 0)
@@ -206,7 +213,7 @@ namespace NuGet.Copy
 
         private IList<string> GetPackages(string workDirectory, string searchFilter)
         {
-            return Directory.GetFiles(workDirectory,searchFilter , SearchOption.AllDirectories);
+            return Directory.GetFiles(workDirectory, searchFilter, SearchOption.AllDirectories);
         }
 
         private bool IsDirectory(string destination)

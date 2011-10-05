@@ -9,7 +9,7 @@ namespace NuGet.Clone
     using NuGet.Copy;
     using System.Linq;
 
-    [Command(typeof(CloneResources), "clone", "Description", MinArgs = 0, MaxArgs = 5, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
+    [Command(typeof(CloneResources), "clone", "Description", MinArgs = 0, MaxArgs = 6, UsageSummaryResourceName = "UsageSummary", UsageDescriptionResourceName = "UsageDescription")]
     public class Clone : Command
     {
         private readonly IPackageRepositoryFactory _repositoryFactory;
@@ -39,9 +39,11 @@ namespace NuGet.Clone
         [Option(typeof(CloneResources), "ApiKeyDescription", AltName = "api")]
         public string ApiKey { get; set; }
 
+        [Option(typeof(CloneResources), "WorkingDirectoryRootDescription", AltName = "workroot")]
+        public string WorkingDirectoryRoot { get; set; }
+
         public override void ExecuteCommand()
         {
-
             string packageId = base.Arguments.Count > 0 ? base.Arguments[0] : string.Empty;
             List<string> packageList = new List<string>();
             //Either use just one package id
@@ -70,7 +72,8 @@ namespace NuGet.Clone
                         Source = Source,
                         Version = package.Version.ToString(),
                         Console = this.Console,
-                        Recursive = false
+                        Recursive = false,
+                        WorkingDirectoryRoot = WorkingDirectoryRoot
                     };
                     copyCommand.Arguments.Add(package.Id);
                     copyCommand.Execute();
