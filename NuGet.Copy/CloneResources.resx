@@ -135,4 +135,7 @@
   <data name="UsageSummary" xml:space="preserve">
     <value>packageId [options]</value>
   </data>
+  <data name="WorkingDirectoryRootDescription" xml:space="preserve">
+    <value>The working directory root for the copy operation</value>
+  </data>
 </root>
