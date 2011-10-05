@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace NuGet.Copy
 {
     using System;
@@ -76,7 +78,13 @@ namespace NuGet.Copy
                               Source.Count == 0 ? "any source" : string.Join(";", Source), string.Join(";", Destination));
 
             CreateWorkDirectoryIfNotExists(_workDirectory);
-            InstallPackageLocally(packageId, _workDirectory);
+
+            if (Recursive)
+                InstallPackageLocally(packageId, _workDirectory);
+            else
+            {
+                GetPackageLocally(packageId, Version, _workDirectory);
+            }
 
             foreach (string dest in Destination)
             {
@@ -86,9 +94,71 @@ namespace NuGet.Copy
             }
         }
 
+        private void GetPackageLocally(string packageId, string version, string workDirectory)
+        {
+            foreach (var source in _sources)
+            {
+                Uri uri;
+                if (Uri.TryCreate(source, UriKind.Absolute, out uri))
+                {
+                    var oDataUri = new UriBuilder(uri.Scheme, uri.Host, uri.Port,
+                                                  string.Format("Package/Download/{0}/{1}", packageId, version));
+
+                    var request = WebRequest.Create(oDataUri.Uri);
+                    request.UseDefaultCredentials = true;
+
+                    Console.WriteLine("Attempting to download package {0} version {1} from uri {2}", packageId, version, request.RequestUri.ToString());
+
+                    using (var response = request.GetResponse())
+                    {
+                        var headers = response.Headers;
+                        var nupkgFileName = headers["Content-Disposition"];
+                        if (!string.IsNullOrEmpty(nupkgFileName))
+                        {
+                            var fileName = nupkgFileName.Split('=')[1];
+                            var filePath = Path.Combine(workDirectory, fileName);
+
+                            using (Stream responseStream = response.GetResponseStream())
+                            {
+                                byte[] result;
+                                var buffer = new byte[4096];
+
+                                using (var memoryStream = new MemoryStream())
+                                {
+                                    int count;
+                                    do
+                                    {
+                                        count = responseStream.Read(buffer, 0, buffer.Length);
+                                        memoryStream.Write(buffer, 0, count);
+
+                                    } while (count != 0);
+
+                                    result = memoryStream.ToArray();
+                                }
+
+                                try
+                                {
+                                    File.WriteAllBytes(filePath, result);
+
+                                    Console.WriteLine("Successfully downloaded package {0} from uri {1}", fileName, request.RequestUri.ToString());
+
+                                    break;
+                                }
+                                catch(Exception ex)
+                                {
+                                    Console.WriteError(ex);
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private static string GetSearchFilter(bool recursive, string packageId, string version)
         {
-            return recursive ? "*.nupkg" : string.Format("{0}.{1}.nupkg", packageId, version);
+            return recursive ? "*.nupkg" : string.Format("{0}-{1}.nupkg", packageId, version);
         }
 
         private void PrepareSources()
