@@ -134,7 +134,7 @@
                     }
                 }
             }
-        }   
+        }
 
         private void PrepareDestinations()
         {
@@ -169,18 +169,18 @@
 
         public IEnumerable<IPackage> GetPackages(string searchFilter)
         {
-            IQueryable<IPackage> packages = GetRepository().GetPackages().OrderBy(p => p.Id); //.Where(p => p.Tags.Contains(searchFilter));
-            //packages.Find(); //.Where(p => p.Tags.Contains(searchFilter));
+            var filteredPackages = GetRepository().GetPackages()
+                                          .OrderBy(p => p.Id)
+                                          .Find(searchFilter);
 
-            packages = packages.Find(new string[] {searchFilter});
-            
             if (AllVersions)
             {
                 // Do not collapse versions
-                return packages;
+                return filteredPackages;
             }
 
-            return packages.DistinctLast(PackageEqualityComparer.Id, PackageComparer.Version);
+            var filteredUniquePackages = filteredPackages;
+            return filteredUniquePackages.Distinct(PackageEqualityComparer.IdAndVersion);
         }
 
         private IPackageRepository GetRepository()

@@ -5,7 +5,6 @@
     using NUnit.Framework;
     using Console = Common.Console;
 
-
     public class CopySearchSpecs
     {
         public abstract class CopyTagsSpecsBase : TinySpec
@@ -25,8 +24,9 @@
                 RemoveAndCreateDirectory(destDir2);
 
                 var defaultPackageSource = new PackageSource(NuGetConstants.DefaultFeedUrl);
-                IPackageSourceProvider sourceProvider = new PackageSourceProvider(Settings.UserSettings, new[] { defaultPackageSource });
-                IPackageRepositoryFactory repositoryFactory = new NuGet.Common.CommandLineRepositoryFactory();
+                var settings = Settings.LoadDefaultSettings();
+                IPackageSourceProvider sourceProvider = new PackageSourceProvider(settings, new[] { defaultPackageSource });
+                IPackageRepositoryFactory repositoryFactory = new CommandLineRepositoryFactory();
 
                 command = new CopySearch(repositoryFactory, sourceProvider);
                 command.Console = new Console();
@@ -34,7 +34,7 @@
 
             protected void RemoveAndCreateDirectory(string directory)
             {
-                if (Directory.Exists(directory)) { Directory.Delete(directory,true); }
+                if (Directory.Exists(directory)) { Directory.Delete(directory, true); }
                 Directory.CreateDirectory(directory);
             }
 
