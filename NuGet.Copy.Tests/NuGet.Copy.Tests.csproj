@@ -33,11 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NuGet, Version=1.4.20615.182, Culture=neutral, processorArchitecture=x86">
-      <ExecutableExtension>.exe</ExecutableExtension>
-      <HintPath>..\packages\NuGet.CommandLine.1.4.20615.182\tools\NuGet.exe</HintPath>
+    <Reference Include="NuGet, Version=2.0.30828.5, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NuGet.CommandLine.2.0.40001\tools\NuGet.exe</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
+    <Reference Include="nunit.framework, Version=2.5.10.11092, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Should">
@@ -52,12 +53,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandLineRepositoryFactory.cs" />
     <Compile Include="CopySearchSpecs.cs" />
+    <Compile Include="CopySpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TinySpec.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="testpackages\grepwin.1.5.1.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

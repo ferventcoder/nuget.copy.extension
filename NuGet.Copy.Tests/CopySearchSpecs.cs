@@ -3,8 +3,8 @@
     using System;
     using System.IO;
     using NUnit.Framework;
+    using Should;
     using Console = Common.Console;
-
 
     public class CopySearchSpecs
     {
@@ -16,6 +16,7 @@
             protected string destDir1 = @".\dest1";
             protected string destDir2 = @".\dest2";
             protected string tagId = "chocolatey";
+            protected int expectedNumberOfPackages = 0;
 
             public override void Context()
             {
@@ -25,8 +26,9 @@
                 RemoveAndCreateDirectory(destDir2);
 
                 var defaultPackageSource = new PackageSource(NuGetConstants.DefaultFeedUrl);
-                IPackageSourceProvider sourceProvider = new PackageSourceProvider(Settings.UserSettings, new[] { defaultPackageSource });
-                IPackageRepositoryFactory repositoryFactory = new NuGet.Common.CommandLineRepositoryFactory();
+                var settings = Settings.LoadDefaultSettings();
+                IPackageSourceProvider sourceProvider = new PackageSourceProvider(settings, new[] { defaultPackageSource });
+                IPackageRepositoryFactory repositoryFactory = new CommandLineRepositoryFactory();
 
                 command = new CopySearch(repositoryFactory, sourceProvider);
                 command.Console = new Console();
@@ -34,7 +36,7 @@
 
             protected void RemoveAndCreateDirectory(string directory)
             {
-                if (Directory.Exists(directory)) { Directory.Delete(directory,true); }
+                if (Directory.Exists(directory)) { Directory.Delete(directory, true); }
                 Directory.CreateDirectory(directory);
             }
 
@@ -67,6 +69,8 @@
                 command.Arguments.Add(tagId);
                 command.Source.Add(sourceDir1);
                 command.Destination.Add(destDir1);
+
+                expectedNumberOfPackages = 4;
             }
 
             public override void Because()
@@ -77,7 +81,13 @@
             [Fact]
             public void should_run_successfully()
             {
+            }
 
+            [Fact]
+            public void should_copy_the_packages_to_destDir1()
+            {
+                var dir = new DirectoryInfo(destDir1);
+                dir.GetFiles().Length.ShouldEqual(expectedNumberOfPackages);
             }
         }
 
@@ -101,6 +111,8 @@
                 command.Source.Add(sourceDir2);
                 command.Destination.Add(destDir1);
                 command.Destination.Add(destDir2);
+
+                expectedNumberOfPackages = 4;
             }
 
             public override void Because()
@@ -111,6 +123,20 @@
             [Fact]
             public void should_run_successfully()
             {
+            }
+
+            [Fact]
+            public void should_copy_the_packages_to_destDir1()
+            {
+                var dir = new DirectoryInfo(destDir1);
+                dir.GetFiles().Length.ShouldEqual(expectedNumberOfPackages);
+            }
+
+            [Fact]
+            public void should_copy_the_packages_to_destDir2()
+            {
+                var dir = new DirectoryInfo(destDir2);
+                dir.GetFiles().Length.ShouldEqual(expectedNumberOfPackages);
             }
         }
     }
