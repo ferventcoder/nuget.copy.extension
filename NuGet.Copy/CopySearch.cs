@@ -169,9 +169,11 @@
 
         public IEnumerable<IPackage> GetPackages(string searchFilter)
         {
-            var filteredPackages = GetRepository().GetPackages()
+            var packages = GetRepository().GetPackages()
                                           .OrderBy(p => p.Id)
-                                          .Find(searchFilter);
+                                          .Take(20).ToList();
+            var filteredPackages = packages.AsQueryable()
+                                          .Find(searchFilter).ToList();
 
             if (AllVersions)
             {

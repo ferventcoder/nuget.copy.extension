@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="CommandLineRepositoryFactory.cs" />
     <Compile Include="CopySearchSpecs.cs" />
+    <Compile Include="CopySpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TinySpec.cs" />
   </ItemGroup>
