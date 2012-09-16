@@ -66,7 +66,7 @@ namespace NuGet.Copy
             foreach (string dest in Destination)
             {
                 PrepareApiKey(dest);
-                PushToDestination(_workDirectory,dest);
+                PushToDestination(_workDirectory, dest);
             }
         }
 
@@ -94,8 +94,8 @@ namespace NuGet.Copy
                     }
                 }
             }
-        }      
-        
+        }
+
         private void PrepareDestinations()
         {
             if (Destination.Count == 0)
@@ -144,7 +144,8 @@ namespace NuGet.Copy
             {
                 if (string.IsNullOrEmpty(ApiKey))
                 {
-                    ApiKey = GetApiKey(_sourceProvider, Settings.UserSettings, destination, true);
+                    ISettings settings = Settings.LoadDefaultSettings();
+                    ApiKey = GetApiKey(_sourceProvider, settings, destination, true);
                 }
             }
         }
@@ -236,13 +237,16 @@ namespace NuGet.Copy
             {
                 throw new CommandLineException(
                     "No API Key was provided and no API Key could be found for {0}. To save an API Key for a source use the 'setApiKey' command.",
-                    new object[] { sourceProvider.GetDisplayName(source) });
+                    new object[] { sourceProvider.ResolveSource(source) });
             }
             return apiKey;
         }
 
         private void PushPackage(string packagePath, string source, string apiKey)
         {
+            throw new NotImplementedException("Push command not working...");
+
+            /*
             var gallery = new GalleryServer(source);
 
             // Push the package to the server
@@ -260,7 +264,7 @@ namespace NuGet.Copy
                 }
             };
 
-            Console.WriteLine("Pushing {0} to {1}", package.GetFullName(), _sourceProvider.GetDisplayName(source));
+            Console.WriteLine("Pushing {0} to {1}", package.GetFullName(), _sourceProvider.ResolveSource(source));
 
             try
             {
@@ -280,16 +284,16 @@ namespace NuGet.Copy
 
             // Publish the package on the server
 
-            var cmd = new PublishCommand(_sourceProvider);
+            var cmd = new PublishCommand();
             cmd.Console = Console;
             cmd.Source = source;
-            cmd.Arguments = new List<string>
-                                {
+            cmd.Arguments.AddRange(new string[] {
                                     package.Id,
                                     package.Version.ToString(),
                                     apiKey
-                                };
+            });
             cmd.Execute();
+             */
         }
 
         #endregion
